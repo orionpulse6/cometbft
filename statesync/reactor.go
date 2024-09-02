@@ -263,7 +263,7 @@ func (r *Reactor) recentSnapshots(n uint32) ([]*snapshot, error) {
 
 // Sync runs a state sync, returning the new state and last commit at the snapshot height.
 // The caller must store the state and commit in the state database and block store.
-func (r *Reactor) Sync(stateProvider StateProvider, discoveryTime time.Duration) (sm.State, *types.Commit, error) {
+func (r *Reactor) Sync(stateProvider StateProvider, maxDiscoveryTime time.Duration) (sm.State, *types.Commit, error) {
 	r.mtx.Lock()
 	if r.syncer != nil {
 		r.mtx.Unlock()
@@ -285,7 +285,7 @@ func (r *Reactor) Sync(stateProvider StateProvider, discoveryTime time.Duration)
 
 	hook()
 
-	state, commit, err := r.syncer.SyncAny(discoveryTime, hook)
+	state, commit, err := r.syncer.SyncAny(maxDiscoveryTime, hook)
 
 	r.mtx.Lock()
 	r.syncer = nil
