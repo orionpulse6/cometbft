@@ -22,10 +22,6 @@ import (
 const (
 	// chunkTimeout is the timeout while waiting for the next chunk from the chunk queue.
 	chunkTimeout = 2 * time.Minute
-
-	// discoveryTime is the time to spend discovering snapshots before initiating
-	// a restore.
-	discoveryTime = 5 * time.Second
 )
 
 var (
@@ -139,15 +135,11 @@ func (s *syncer) RemovePeer(peer p2p.Peer) {
 }
 
 // SyncAny tries to sync any of the snapshots in the snapshot pool, waiting to discover further
-// snapshots if none were found for 5 seconds. It returns the latest state and block commit
+// snapshots if none were found for discoveryTime. It returns the latest state and block commit
 // which the caller must use to bootstrap the node.
 //
 // If none snapshots are found after maxDiscoveryTime, errNoSnapshots is returned.
-func (s *syncer) SyncAny(maxDiscoveryTime time.Duration, retryHook func()) (sm.State, *types.Commit, error) {
-	if maxDiscoveryTime < discoveryTime {
-		s.logger.Info(fmt.Sprintf("max_discovery_time is less than %v, overwriting...", discoveryTime))
-	}
-
+func (s *syncer) SyncAny(discoveryTime, maxDiscoveryTime time.Duration, retryHook func()) (sm.State, *types.Commit, error) {
 	timeStart := time.Now()
 
 	s.logger.Info(fmt.Sprintf("Discovering snapshots for %v", discoveryTime))

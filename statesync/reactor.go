@@ -285,7 +285,9 @@ func (r *Reactor) Sync(stateProvider StateProvider, maxDiscoveryTime time.Durati
 
 	hook()
 
-	state, commit, err := r.syncer.SyncAny(maxDiscoveryTime, hook)
+	// The time to spend discovering snapshots before initiating a restore.
+	const discoveryTime = 5 * time.Second
+	state, commit, err := r.syncer.SyncAny(discoveryTime, maxDiscoveryTime, hook)
 
 	r.mtx.Lock()
 	r.syncer = nil
